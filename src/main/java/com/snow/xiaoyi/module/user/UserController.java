@@ -8,6 +8,7 @@
 package com.snow.xiaoyi.module.user;
 
 import com.snow.xiaoyi.common.mapper.UserMapper;
+import com.snow.xiaoyi.common.pojo.User;
 import com.snow.xiaoyi.common.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -65,6 +66,16 @@ public class UserController {
     }
 
 
+    @GetMapping("test5")
+    public ResponseEntity test5(){
+
+        Map<String,Integer> map=new HashMap<>();
+        map.put("iid",1);
+
+        User user=userMapper.findById(map);
+
+        return ResponseEntity.ok(user);
+    }
 
 
 }

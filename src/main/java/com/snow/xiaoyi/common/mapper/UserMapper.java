@@ -25,6 +25,12 @@ public interface UserMapper {
     void testx(Map<String,Integer> map);
 
 
+    @Select({
+            "call findById(#{iid,mode=IN,jdbcType=INTEGER})"
+    })
+    User findById(Map<String,Integer> map);
+
+
 
 
 }
