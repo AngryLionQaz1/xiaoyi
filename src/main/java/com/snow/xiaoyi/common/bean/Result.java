@@ -1,5 +1,6 @@
 package com.snow.xiaoyi.common.bean;
 
+
 public class Result {
 
 
@@ -7,6 +8,10 @@ public class Result {
     private String msg="";
     private Object data="";
 
+
+    public Result(){
+
+    }
 
     public Result(Integer code, String msg) {
         this.code = code;

@@ -2,6 +2,7 @@ package com.snow.xiaoyi.config.interceptor;
 
 import com.alibaba.fastjson.JSON;
 import com.snow.xiaoyi.common.bean.Config;
+import com.snow.xiaoyi.common.bean.Result;
 import com.snow.xiaoyi.common.pojo.Role;
 import com.snow.xiaoyi.common.pojo.User;
 import com.snow.xiaoyi.common.repository.UserRepository;
@@ -21,6 +22,7 @@ import java.io.PrintWriter;
 import java.util.*;
 
 import static com.snow.xiaoyi.common.bean.Result.auth;
+import static com.snow.xiaoyi.common.bean.Result.over;
 
 
 @Component
@@ -42,8 +44,7 @@ public class SecurityInterceptor extends HandlerInterceptorAdapter {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         //如果不是映射到方法直接通过
         if (!(handler instanceof HandlerMethod)) return true;
-        if (hasPermission(request,handler))return true;
-        response(response);
+        if (hasPermission(request,response,handler))return true;
         return false;
     }
 
@@ -55,7 +56,7 @@ public class SecurityInterceptor extends HandlerInterceptorAdapter {
     }
 
 
-    private boolean hasPermission(HttpServletRequest request,Object handler) {
+    private boolean hasPermission(HttpServletRequest request, HttpServletResponse response,Object handler) {
             HandlerMethod handlerMethod = (HandlerMethod) handler;
             String token=request.getHeader(config.getAuthorization());
             //获取类上的注解
@@ -64,8 +65,17 @@ public class SecurityInterceptor extends HandlerInterceptorAdapter {
             if (requiredPermission==null) requiredPermission = handlerMethod.getMethod().getAnnotation(SecurityPermission.class);
             if (requiredPermission==null)return true;
             if (!"".equals(requiredPermission.value())&&permission(request.getRequestURI(),requiredPermission.value()))return true;
-            if (Optional.ofNullable(token).isPresent()&& jwtToken.validateToken(token)&&jwtToken.getUserId(token)!=null)return permissionUser(request.getRequestURI(),jwtToken.getUserId(token));
-            return false;
+            if (Optional.ofNullable(token).isPresent()&& jwtToken.validateToken(token)&&jwtToken.getUserId(token)!=null){
+                if (permissionUser(request.getRequestURI(),jwtToken.getUserId(token))){
+                    return true;
+                }else {
+                    response(response,auth());
+                    return false;
+                }
+            }else {
+                response(response,over());
+                return false;
+            }
     }
 
     private boolean permissionUser(String uri,String id){
@@ -117,7 +127,7 @@ public class SecurityInterceptor extends HandlerInterceptorAdapter {
         return flag;
     }
 
-    public void response(HttpServletResponse response){
+    public void response(HttpServletResponse response, Result result){
         response.setHeader("Cache-Control", "no-store");
         response.setHeader("Pragma", "no-cache");
         response.setCharacterEncoding("UTF-8");
@@ -125,7 +135,7 @@ public class SecurityInterceptor extends HandlerInterceptorAdapter {
         PrintWriter out= null;
         try {
             out = response.getWriter();
-            out.write(JSON.toJSONString(auth()));
+            out.write(JSON.toJSONString(result));
             out.flush();
         } catch (IOException e) {
         }finally {

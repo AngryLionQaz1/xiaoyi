@@ -7,12 +7,17 @@
  */
 package com.snow.xiaoyi.module.user;
 
+import com.snow.xiaoyi.common.bean.Result;
 import com.snow.xiaoyi.common.mapper.UserMapper;
 import com.snow.xiaoyi.common.pojo.User;
 import com.snow.xiaoyi.common.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
@@ -26,6 +31,51 @@ public class UserController {
     private UserRepository userRepository;
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private StringRedisTemplate template;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private RedisTemplate<Object, Object> redisTemplate;
+
+
+
+
+    @PostMapping("redis1")
+    public void redis1(){
+
+        User user=User.builder().username("小易").password("xiaoyi").id(1L).build();
+
+        template.opsForValue().append("date", user.toString());
+        System.out.println(template.opsForValue().get("date"));
+
+    }
+
+
+
+
+    @GetMapping("redis2")
+    public void redis2(){
+        for (int i = 0; i < 2; i++) {
+            User user = (User) userService.getUser(String.valueOf(i)).getData();
+            System.out.println(user);
+        }
+    }
+
+    @PostMapping("redis3")
+    public void redis3(){
+
+        User user=User.builder().username("小易").password("xiaoyi").id(1L).build();
+
+        redisTemplate.opsForValue().set("xx",user);
+        System.out.println(template.opsForValue().get("xx"));
+
+    }
+
+
+
+
 
 
 

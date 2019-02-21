@@ -1,0 +1,11 @@
+##swagger 配置
+swagger:
+  enabled: true
+  title: TEST Api
+  authorization:
+    key-name: authorization
+  docket:
+    test:
+      base-package: com.snow.xiaoyi.module.test
+    user:
+      base-package: com.snow.xiaoyi.module.user
