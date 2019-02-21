@@ -41,6 +41,11 @@ public class UserController {
 
 
 
+    @GetMapping("users")
+    public Result users(){
+        return Result.success(userRepository.findAll());
+    }
+
 
     @PostMapping("redis1")
     public void redis1(){
