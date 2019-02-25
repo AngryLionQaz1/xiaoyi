@@ -9,19 +9,20 @@ package com.snow.xiaoyi.module.user;
 
 import com.snow.xiaoyi.common.bean.Result;
 import com.snow.xiaoyi.common.mapper.UserMapper;
+import com.snow.xiaoyi.common.pojo.Authority;
+import com.snow.xiaoyi.common.pojo.Role;
 import com.snow.xiaoyi.common.pojo.User;
 import com.snow.xiaoyi.common.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 public class UserController {
@@ -39,6 +40,36 @@ public class UserController {
     @Autowired
     private RedisTemplate<Object, Object> redisTemplate;
 
+
+
+    @GetMapping("sxs")
+    public ResponseEntity sxs(){
+
+        return ResponseEntity.ok(Result.success(User.builder().build()));
+
+    }
+    @GetMapping("sxs2")
+    public Result sxs2(){
+
+        return Result.success(User.builder().build());
+
+    }
+
+
+    @PostMapping("login")
+    public void addUser(@RequestParam Long name,
+                        @RequestParam String password){
+
+        Optional<User> byUsername = userRepository.findById(name);
+        if (!byUsername.isPresent())return;
+        User user=byUsername.get();
+        List<Role> roles=user.getRoles();
+        System.out.println(roles);
+
+
+
+
+    }
 
 
     @GetMapping("users")

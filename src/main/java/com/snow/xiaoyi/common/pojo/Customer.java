@@ -23,7 +23,7 @@ public class Customer implements Serializable {
     private String lastName;
 
 //    @Type(type = "org.hibernate.spatial.GeometryType")
-    @Type(type = "jts_geometry")
+//    @Type(type = "jts_geometry")
     private Geometry geom;
 
     public Customer(long id, String firstName, String lastName, Geometry geom) {

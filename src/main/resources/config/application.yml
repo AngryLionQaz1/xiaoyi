@@ -1,5 +1,5 @@
 ##主配置信息
 spring:
   profiles:
-    active: dev,postgis,swagger,redis
+    active: dev,mysql,swagger,redis
 

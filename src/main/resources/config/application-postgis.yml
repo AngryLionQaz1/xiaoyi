@@ -7,7 +7,6 @@ postgreName: root
 postgreSqlPassword: xiaoyi
 postgreSqlDriver: org.postgresql.Driver
 
-
 spring:
   jpa:
     properties:
