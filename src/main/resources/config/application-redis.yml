@@ -1,6 +1,6 @@
 
 ###Redis配置
-redisDatabase: 1
+redisDatabase: 2
 redisHost: 47.92.213.93
 redisPort: 6379
 redisPassword: xiaoyi

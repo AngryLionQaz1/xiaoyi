@@ -43,7 +43,7 @@ public class User  {
     private String password;
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
-    @ManyToMany(targetEntity = Role.class,fetch = FetchType.EAGER)
+    @ManyToMany(targetEntity = Role.class,fetch = FetchType.LAZY)
     @JoinTable(joinColumns={@JoinColumn(name="user_id")}, inverseJoinColumns={@JoinColumn(name="role_id")})
 //    @JSONField(serialize = false)
     private List<Role> roles=new ArrayList<>();

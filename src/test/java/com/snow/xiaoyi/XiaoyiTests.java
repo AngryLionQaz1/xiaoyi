@@ -1,5 +1,6 @@
 package com.snow.xiaoyi;
 
+import com.snow.xiaoyi.common.mapper.UserMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,17 @@ public class XiaoyiTests {
 
     @Autowired
     private SXS sxs;
+    @Autowired
+    private UserMapper userMapper;
+
+    @Test
+    public void test(){
+
+        userMapper.user(1L);
+
+
+    }
+
 
     @Test
     public void contextLoads() throws ExecutionException, InterruptedException {

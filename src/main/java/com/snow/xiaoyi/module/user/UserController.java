@@ -13,6 +13,7 @@ import com.snow.xiaoyi.common.pojo.Role;
 import com.snow.xiaoyi.common.pojo.User;
 import com.snow.xiaoyi.common.repository.UserRepository;
 import com.snow.xiaoyi.config.annotation.SecurityPermission;
+import com.snow.xiaoyi.config.token.JWTToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -22,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+
 
 @RestController
 public class UserController {
@@ -39,10 +40,18 @@ public class UserController {
     private UserService userService;
     @Autowired
     private RedisTemplate<Object, Object> redisTemplate;
+    @Autowired
+    private JWTToken jwtToken;
 
 
+
+    @GetMapping("sxsw")
+    public User user(){
+      return   userMapper.user(1L);
+    }
 
     @GetMapping("sxs")
+    @SecurityPermission
     public ResponseEntity sxs(){
 
         return ResponseEntity.ok(Result.success(User.builder().build()));
@@ -51,7 +60,7 @@ public class UserController {
     @GetMapping("sxs2")
     public Result sxs2(){
 
-        return Result.success(User.builder().build());
+        return Result.success(User.builder().token(jwtToken.createToken("1")).build());
 
     }
 
