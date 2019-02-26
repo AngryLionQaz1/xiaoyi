@@ -34,7 +34,7 @@ public class SecurityInterceptor extends HandlerInterceptorAdapter {
     @Autowired
     private JWTToken jwtToken;
     @Autowired
-    private UserRepository userRepository;
+    private UserRedis userRedis;
     @Autowired
     private SecurityContextHolder securityContextHolder;
 
@@ -80,14 +80,14 @@ public class SecurityInterceptor extends HandlerInterceptorAdapter {
 
     private boolean permissionUser(String uri,String id){
         boolean flag=false;
-        Optional<User> o=userRepository.findById(Long.valueOf(id));
-        if (!o.isPresent())return false;
-        List<Role> roles=o.get().getRoles();
-        if (checkAdmin(roles))return setUser(o.get());
+        User o=userRedis.getUser(Long.valueOf(id));
+        if (o==null)return false;
+        List<Role> roles=o.getRoles();
+        if (checkAdmin(roles))return setUser(o);
         for (int i=0;i<roles.size();i++){
             for (int j=0;j<roles.get(i).getAuthorities().size();j++){
                 if (uri.equals(roles.get(i).getAuthorities().get(j).getUri())){
-                    flag=setUser(o.get());
+                    flag=setUser(o);
                     break;
                 }
             }

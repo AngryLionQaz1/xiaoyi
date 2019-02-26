@@ -9,10 +9,10 @@ package com.snow.xiaoyi.module.user;
 
 import com.snow.xiaoyi.common.bean.Result;
 import com.snow.xiaoyi.common.mapper.UserMapper;
-import com.snow.xiaoyi.common.pojo.Authority;
 import com.snow.xiaoyi.common.pojo.Role;
 import com.snow.xiaoyi.common.pojo.User;
 import com.snow.xiaoyi.common.repository.UserRepository;
+import com.snow.xiaoyi.config.annotation.SecurityPermission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -57,17 +57,21 @@ public class UserController {
 
 
     @PostMapping("login")
-    public void addUser(@RequestParam Long name,
+    public Result addUser(@RequestParam Long name,
                         @RequestParam String password){
 
-        Optional<User> byUsername = userRepository.findById(name);
-        if (!byUsername.isPresent())return;
-        User user=byUsername.get();
-        List<Role> roles=user.getRoles();
-        System.out.println(roles);
+//        Optional<User> byUsername = userRepository.findById(name);
+//        if (!byUsername.isPresent())return null;
+//        User user=byUsername.get();
+//        List<Role> roles=user.getRoles();
+//        System.out.println(roles.get(0).getAuthorities().get(0).getUri());
+//        redisTemplate.opsForValue().set(user.getId()+"",user);
+//        User ssx= (User) redisTemplate.opsForValue().get(user.getId()+"");
+//        System.out.println(ssx);
 
 
 
+        return Result.success(userService.users(Long.valueOf(name)));
 
     }
 
