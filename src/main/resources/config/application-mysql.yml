@@ -4,7 +4,7 @@ mysqlHost: 47.92.213.93
 mysqlUserName: root
 mysqlPassword: liaolin2018
 mysqlDriver: com.mysql.cj.jdbc.Driver
-mysqlDateBase: test
+mysqlDateBase: xy
 mysqlUrl: jdbc:mysql://${mysqlHost}:${mysqlPort}/${mysqlDateBase}?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
 
 

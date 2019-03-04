@@ -49,9 +49,6 @@ public class Config {
     private String authorityAdmin="admin";
     /**权限管理 是否初始化 权限*/
     private Boolean authorityInit=false;
-    /**权限类型 默认分类*/
-    private Integer authorityType=0;
-    private String authorityTypeName="测试";
     /**AES加密KEY*/
     private String aesKey="QAZWSXEDCR123456";
     /**字符集*/

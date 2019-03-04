@@ -7,9 +7,7 @@ import com.snow.xiaoyi.common.pojo.User;
 import com.snow.xiaoyi.common.repository.AuthorityRepository;
 import com.snow.xiaoyi.common.repository.RoleRepository;
 import com.snow.xiaoyi.common.repository.UserRepository;
-import com.snow.xiaoyi.config.annotation.Decrypt;
-import com.snow.xiaoyi.config.annotation.Encrypt;
-import com.snow.xiaoyi.config.annotation.SecurityPermission;
+import com.snow.xiaoyi.config.annotation.*;
 import com.snow.xiaoyi.config.token.JWTToken;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -18,13 +16,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
 
 @Api(tags = "测试")
 @RestController
 @RequestMapping("test")
+@AuthX(value = 1,name = "测试S",flag = true)
 public class TestController {
 
     @Autowired
@@ -42,17 +40,58 @@ public class TestController {
 
 
 
+    @GetMapping("auths")
+    @ApiOperation(value = "获取所有")
+    public Result auths(){
+        List<Authority> all = authorityRepository.findAll();
+        return Result.success( auth(all));
+    }
+
+
+    public List<Authority> auth(List<Authority> list){
+
+        //获取顶级
+        //按group属性分组
+        List<Authority> authorities=authorityRepository.findByFlag(true);
+        List<Authority> ax=new ArrayList<>();
+        for (int i=0;i<authorities.size();i++){
+           Authority a=authorities.get(i);
+           a.setAuthorities(menuChild(a.getCode(),list));
+           ax.add(a);
+        }
+        return ax;
+    }
+
+
+    public List<Authority> menuChild(String code,List<Authority> list){
+        List<Authority> lists = new ArrayList<Authority>();
+        for(Authority a:list){
+            if (a.getFlag())continue;
+            if (a.getPCode().equals(code)){
+                a.setAuthorities(menuChild(a.getCode(),list));
+                lists.add(a);
+            }
+        }
+        return lists;
+    }
+
+
+
 
 
 
     @GetMapping("sexs")
     @Encrypt
+    @Auth(11)
+    @ApiOperation(value = "加密测试",notes = "xxxxx")
     public Result sexs(){
         return Result.success("好");
     }
 
     @PostMapping("usersx")
     @Decrypt
+    @AuthX(value = 1,name = "二级测试")
+    @Auth(111)
     public Result usersx(@RequestBody Result result){
         return result;
     }

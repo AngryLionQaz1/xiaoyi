@@ -12,6 +12,8 @@ import com.snow.xiaoyi.common.mapper.UserMapper;
 import com.snow.xiaoyi.common.pojo.Role;
 import com.snow.xiaoyi.common.pojo.User;
 import com.snow.xiaoyi.common.repository.UserRepository;
+import com.snow.xiaoyi.config.annotation.Auth;
+import com.snow.xiaoyi.config.annotation.AuthX;
 import com.snow.xiaoyi.config.annotation.SecurityPermission;
 import com.snow.xiaoyi.config.token.JWTToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +23,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
+
 import java.util.Map;
 
 
 @RestController
+@AuthX(value = 2,name = "用户",flag = true)
 public class UserController {
 
 
@@ -46,6 +49,7 @@ public class UserController {
 
 
     @GetMapping("sxsw")
+    @Auth(value = 21)
     public User user(){
       return   userMapper.user(1L);
     }

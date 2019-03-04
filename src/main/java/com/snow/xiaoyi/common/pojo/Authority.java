@@ -22,17 +22,24 @@ public class Authority {
     private Long id;
     /**权限名*/
     private String name;
-    /**类别*/
-    private Integer type;
+    /**权限编码*/
+    @Column(unique = true)
+    private String code;
+    /**父级编码*/
+    private String pCode;
     /**类别名*/
-    private String typeName;
+    private String pName;
     /**权限uri*/
     private String uri;
     /**详细描述*/
     private String details;
-    @ManyToMany(cascade=CascadeType.REFRESH,mappedBy="authorities",fetch = FetchType.EAGER)
-    @JSONField(serialize = false)
-    private List<Role> roles;
+    /**顶级 true 为顶级 false 非顶级*/
+    private Boolean flag;
+//    @ManyToMany(cascade=CascadeType.REFRESH,mappedBy="authorities",fetch = FetchType.EAGER)
+//    @JSONField(serialize = false)
+//    private List<Role> roles;
+    @Transient
+    private List<Authority> authorities;
 
 
 

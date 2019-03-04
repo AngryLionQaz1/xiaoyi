@@ -3,6 +3,8 @@ package com.snow.xiaoyi.config.init;
 import com.snow.xiaoyi.common.bean.Config;
 import com.snow.xiaoyi.common.pojo.Authority;
 import com.snow.xiaoyi.common.repository.AuthorityRepository;
+import com.snow.xiaoyi.config.annotation.Auth;
+import com.snow.xiaoyi.config.annotation.AuthX;
 import com.snow.xiaoyi.config.annotation.AuthorityType;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -60,10 +62,12 @@ public class AppInit implements ApplicationRunner {
     private Authority makeData(Map<String,String> map){
         Authority a=Authority.builder().build();
         if (map.containsKey("name"))a.setName(map.get("name"));
+        if (map.containsKey("code"))a.setCode(map.get("code"));
+        if (map.containsKey("pCode"))a.setPCode(map.get("pCode"));
         if (map.containsKey("url"))a.setUri(map.get("url"));
         if (map.containsKey("details"))a.setDetails(map.get("details"));
-        if (map.containsKey("typeName"))a.setTypeName(map.get("typeName"));
-        if (map.containsKey("type"))a.setType(Integer.valueOf(map.get("type")));
+        if (map.containsKey("pName"))a.setPName(map.get("pName"));
+        a.setFlag(false);
         return a;
     }
     
@@ -99,41 +103,61 @@ public class AppInit implements ApplicationRunner {
     public  Map<String,String> makeAuthority(RequestMappingInfo info,  Map<RequestMappingInfo,HandlerMethod> map){
         HandlerMethod hm = map.get(info);
         Method m = hm.getMethod();
-        Integer code=getAuthorityType(m);
-        if (code==config.getAuthorityType())return null;
-        Map<String,String> limitMap = new HashMap<>();
+        Map<String,String> limitMap=auth(m);
+        if (limitMap==null)return null;
         //获取url的Set集合，一个方法可能对应多个url
         Set<String> patterns = info.getPatternsCondition().getPatterns();
         for (String url : patterns) limitMap.put("url",url);
-        getAuthority(m,limitMap,code);
+        getAuthority(m,limitMap);
         return limitMap;
     }
 
     /**
-     * 获取type类型
-     * @param m
-     * @return
+     * 权限分类
      */
-    public Integer getAuthorityType(Method m){
-        // 获取方法上的注解
-        AuthorityType authorityType=m.getAnnotation(AuthorityType.class);
-        //获取类上的注解
-        if (authorityType==null)authorityType=m.getDeclaringClass().getAnnotation(AuthorityType.class);
-        if (authorityType==null)return config.getAuthorityType();
-        return authorityType.code();
+    public Map<String,String> auth(Method m){
+        //获取方法上的注解
+        Auth a=m.getAnnotation(Auth.class);
+        if (a==null)return null;
+        //获取类上注解
+        AuthX ax=m.getDeclaringClass().getAnnotation(AuthX.class);
+        if (ax==null)return null;
+        Map<String,String> map=new HashMap<>();
+        map.put("code",String.valueOf(a.value()));
+        map.put("pCode",String.valueOf(ax.value()));
+        map.put("pName",String.valueOf(ax.name()));
+        if (ax.flag())initFlag(ax);
+        AuthX ax2=m.getAnnotation(AuthX.class);
+        if (ax2!=null){
+            map.put("pCode",String.valueOf(ax2.value()));
+            map.put("pName",String.valueOf(ax2.name()));
+        }
+        return map;
     }
+
+    /**
+     * 顶级初始化
+     */
+    public void initFlag(AuthX authX){
+        Optional<Authority> byCode = authorityRepository.findByCode(String.valueOf(authX.value()));
+        if (byCode.isPresent())return;
+        Authority build = Authority.builder()
+                .name(authX.name())
+                .code(String.valueOf(authX.value()))
+                .flag(true)
+                .pCode(String.valueOf(authX.value()))
+                .build();
+        authorityRepository.save(build);
+    }
+
+
 
     /**
      * 获取参数信息
      * @param m
      * @param limitMap
-     * @param type
      */
-    public void getAuthority(Method m,Map<String,String> limitMap,Integer type){
-        limitMap.put("type",String.valueOf(type));
-        Api api=m.getDeclaringClass().getAnnotation(Api.class);
-        if (api!=null)limitMap.put("typeName",api.tags()[0]);
-        if (api==null)limitMap.put("typeName",config.getAuthorityTypeName());
+    public void getAuthority(Method m,Map<String,String> limitMap){
         ApiOperation apiOperation = m.getAnnotation(ApiOperation.class);
         Method[] me = {};
         if(apiOperation!=null) me = apiOperation.annotationType().getDeclaredMethods();
