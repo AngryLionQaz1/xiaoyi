@@ -126,17 +126,19 @@ public class AppInit implements ApplicationRunner {
         map.put("code",String.valueOf(a.value()));
         map.put("pCode",String.valueOf(ax.value()));
         map.put("pName",String.valueOf(ax.name()));
-        if (ax.flag())initFlag(ax);
+        initFlag(ax);
         AuthX ax2=m.getAnnotation(AuthX.class);
         if (ax2!=null){
+            initFlag(String.valueOf(ax.value()),ax2);
             map.put("pCode",String.valueOf(ax2.value()));
             map.put("pName",String.valueOf(ax2.name()));
         }
         return map;
     }
 
-    /**
-     * 顶级初始化
+
+    /***
+     * 菜单初始化
      */
     public void initFlag(AuthX authX){
         Optional<Authority> byCode = authorityRepository.findByCode(String.valueOf(authX.value()));
@@ -144,12 +146,22 @@ public class AppInit implements ApplicationRunner {
         Authority build = Authority.builder()
                 .name(authX.name())
                 .code(String.valueOf(authX.value()))
-                .flag(true)
+                .flag(authX.flag())
                 .pCode(String.valueOf(authX.value()))
                 .build();
         authorityRepository.save(build);
     }
-
+    public void initFlag(String pCode, AuthX authX){
+        Optional<Authority> byCode = authorityRepository.findByCode(String.valueOf(authX.value()));
+        if (byCode.isPresent())return;
+        Authority build = Authority.builder()
+                .name(authX.name())
+                .code(String.valueOf(authX.value()))
+                .flag(authX.flag())
+                .pCode(pCode)
+                .build();
+        authorityRepository.save(build);
+    }
 
 
     /**

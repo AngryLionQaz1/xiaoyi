@@ -35,6 +35,7 @@ public class Authority {
     private String details;
     /**顶级 true 为顶级 false 非顶级*/
     private Boolean flag;
+
 //    @ManyToMany(cascade=CascadeType.REFRESH,mappedBy="authorities",fetch = FetchType.EAGER)
 //    @JSONField(serialize = false)
 //    private List<Role> roles;

@@ -28,7 +28,7 @@ import java.util.Map;
 
 
 @RestController
-@AuthX(value = 2,name = "用户",flag = true)
+//@AuthX(value = 2,name = "用户",flag = true)
 public class UserController {
 
 
@@ -49,7 +49,7 @@ public class UserController {
 
 
     @GetMapping("sxsw")
-    @Auth(value = 21)
+//    @Auth(value = 21)
     public User user(){
       return   userMapper.user(1L);
     }

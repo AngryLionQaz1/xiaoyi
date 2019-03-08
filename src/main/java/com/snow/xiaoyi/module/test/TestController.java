@@ -82,7 +82,8 @@ public class TestController {
 
     @GetMapping("sexs")
     @Encrypt
-    @Auth(11)
+    @Auth(111)
+    @AuthX(value = 11,name = "测试二级")
     @ApiOperation(value = "加密测试",notes = "xxxxx")
     public Result sexs(){
         return Result.success("好");
@@ -90,8 +91,8 @@ public class TestController {
 
     @PostMapping("usersx")
     @Decrypt
-    @AuthX(value = 1,name = "二级测试")
-    @Auth(111)
+    @Auth(112)
+    @AuthX(value = 11,name = "测试二级")
     public Result usersx(@RequestBody Result result){
         return result;
     }
