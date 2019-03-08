@@ -35,6 +35,8 @@ public class Authority {
     private String details;
     /**顶级 true 为顶级 false 非顶级*/
     private Boolean flag;
+    /**是不是菜单*/
+    private Boolean ifMenu;
 
 //    @ManyToMany(cascade=CascadeType.REFRESH,mappedBy="authorities",fetch = FetchType.EAGER)
 //    @JSONField(serialize = false)

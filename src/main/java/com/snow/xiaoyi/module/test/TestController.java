@@ -1,6 +1,7 @@
 package com.snow.xiaoyi.module.test;
 
 import com.snow.xiaoyi.common.bean.Result;
+import com.snow.xiaoyi.common.bean.Tips;
 import com.snow.xiaoyi.common.pojo.Authority;
 import com.snow.xiaoyi.common.pojo.Role;
 import com.snow.xiaoyi.common.pojo.User;
@@ -82,7 +83,8 @@ public class TestController {
 
     @GetMapping("sexs")
     @Encrypt
-    @Auth(111)
+    @Auth(1111)//四级
+    @AuthS(value = 111,name = "测试三级")
     @AuthX(value = 11,name = "测试二级")
     @ApiOperation(value = "加密测试",notes = "xxxxx")
     public Result sexs(){

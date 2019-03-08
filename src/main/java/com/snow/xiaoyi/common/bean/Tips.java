@@ -9,7 +9,8 @@ public enum Tips {
     USER_NOT("用户信息不存在"),
     PASSWORD_FALSE("密码错误"),
     TYPE_FALSE("文件类型不支持"),
-    PROJECT_HAD("项目信息已存在")
+    PROJECT_HAD("项目信息已存在"),
+    XXX(1),
 
     ;
 
@@ -17,6 +18,10 @@ public enum Tips {
     public Integer code;
     public String msg;
 
+
+    Tips(Integer code){
+          this.code=code;
+    }
 
     Tips(String msg) {
         this.msg = msg;

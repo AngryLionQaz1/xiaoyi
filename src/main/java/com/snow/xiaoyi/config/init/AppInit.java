@@ -4,6 +4,7 @@ import com.snow.xiaoyi.common.bean.Config;
 import com.snow.xiaoyi.common.pojo.Authority;
 import com.snow.xiaoyi.common.repository.AuthorityRepository;
 import com.snow.xiaoyi.config.annotation.Auth;
+import com.snow.xiaoyi.config.annotation.AuthS;
 import com.snow.xiaoyi.config.annotation.AuthX;
 import com.snow.xiaoyi.config.annotation.AuthorityType;
 import io.swagger.annotations.Api;
@@ -68,6 +69,7 @@ public class AppInit implements ApplicationRunner {
         if (map.containsKey("details"))a.setDetails(map.get("details"));
         if (map.containsKey("pName"))a.setPName(map.get("pName"));
         a.setFlag(false);
+        a.setIfMenu(false);
         return a;
     }
     
@@ -133,6 +135,12 @@ public class AppInit implements ApplicationRunner {
             map.put("pCode",String.valueOf(ax2.value()));
             map.put("pName",String.valueOf(ax2.name()));
         }
+        AuthS ax3=m.getAnnotation(AuthS.class);
+        if (ax3!=null){
+            initFlag(String.valueOf(ax2.value()),ax3);
+            map.put("pCode",String.valueOf(ax3.value()));
+            map.put("pName",String.valueOf(ax3.name()));
+        }
         return map;
     }
 
@@ -148,6 +156,7 @@ public class AppInit implements ApplicationRunner {
                 .code(String.valueOf(authX.value()))
                 .flag(authX.flag())
                 .pCode(String.valueOf(authX.value()))
+                .ifMenu(true)
                 .build();
         authorityRepository.save(build);
     }
@@ -159,10 +168,22 @@ public class AppInit implements ApplicationRunner {
                 .code(String.valueOf(authX.value()))
                 .flag(authX.flag())
                 .pCode(pCode)
+                .ifMenu(true)
                 .build();
         authorityRepository.save(build);
     }
-
+    public void initFlag(String pCode, AuthS authS){
+        Optional<Authority> byCode = authorityRepository.findByCode(String.valueOf(authS.value()));
+        if (byCode.isPresent())return;
+        Authority build = Authority.builder()
+                .name(authS.name())
+                .code(String.valueOf(authS.value()))
+                .flag(authS.flag())
+                .pCode(pCode)
+                .ifMenu(true)
+                .build();
+        authorityRepository.save(build);
+    }
 
     /**
      * 获取参数信息
