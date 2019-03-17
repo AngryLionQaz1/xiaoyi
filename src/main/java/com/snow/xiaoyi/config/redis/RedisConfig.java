@@ -64,7 +64,7 @@ public class RedisConfig extends CachingConfigurerSupport {
         RedisSerializationContext.SerializationPair<Object> pair = RedisSerializationContext.SerializationPair.fromSerializer(fastJsonRedisSerializer);
         RedisCacheConfiguration defaultCacheConfig=RedisCacheConfiguration.defaultCacheConfig().serializeValuesWith(pair);
         //设置默认超过期时间是30秒
-        defaultCacheConfig = defaultCacheConfig.entryTtl(Duration.ofSeconds(30));//设置过期时间
+        defaultCacheConfig = defaultCacheConfig.entryTtl(Duration.ofSeconds(300));//设置过期时间
         //初始化RedisCacheManager
         RedisCacheManager cacheManager = new RedisCacheManager(redisCacheWriter, defaultCacheConfig);
         return cacheManager;

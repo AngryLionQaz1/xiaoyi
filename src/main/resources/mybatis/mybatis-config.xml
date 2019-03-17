@@ -12,6 +12,8 @@
         <setting name="mapUnderscoreToCamelCase" value="true"/>
         <!-- 打印查询语句 -->
         <setting name="logImpl" value="STDOUT_LOGGING" />
+        <!--解决返回map类型数据空值字段不显示-->
+        <setting name="callSettersOnNulls" value="true"/>
     </settings>
 
     <typeAliases>

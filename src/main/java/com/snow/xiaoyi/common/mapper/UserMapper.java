@@ -15,6 +15,11 @@ import java.util.Map;
 @Mapper
 public interface UserMapper {
 
+
+    @Select("select*from s_user")
+    List<Map<String,Object>> sss();
+
+
     @Select("select * from s_user")
     List<User> findAll();
 

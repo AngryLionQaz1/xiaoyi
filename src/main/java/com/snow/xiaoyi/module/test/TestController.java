@@ -2,6 +2,7 @@ package com.snow.xiaoyi.module.test;
 
 import com.snow.xiaoyi.common.bean.Result;
 import com.snow.xiaoyi.common.bean.Tips;
+import com.snow.xiaoyi.common.mapper.UserMapper;
 import com.snow.xiaoyi.common.pojo.Authority;
 import com.snow.xiaoyi.common.pojo.Role;
 import com.snow.xiaoyi.common.pojo.User;
@@ -36,6 +37,25 @@ public class TestController {
     private RoleRepository roleRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UserMapper userMapper;
+
+
+
+    @GetMapping("ssxsee1")
+    public Result sssexsl1(){
+
+
+        List<Map<String,Object>> sxs=new ArrayList<>();
+
+        List<Map<String,Object>> sss=userMapper.sss();
+        List<Map<String,Object>> sss2=userMapper.sss();
+        sxs.addAll(sss);
+        sxs.addAll(sss2);
+        System.out.println(sxs.size());
+
+        return Result.success(sxs);
+    }
 
 
 
