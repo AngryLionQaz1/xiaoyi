@@ -23,14 +23,18 @@ public class JsonConfig {
         FastJsonHttpMessageConverter fastConverter = new FastJsonHttpMessageConverter();
         // 2 添加fastjson 的配置信息 比如 是否要格式化 返回的json数据
         FastJsonConfig fastJsonConfig = new FastJsonConfig();
-        //格式化
-        fastJsonConfig.setSerializerFeatures(SerializerFeature.PrettyFormat);
-        //是否输出值为null的字段,默认为false
-        fastJsonConfig.setSerializerFeatures(SerializerFeature.WriteMapNullValue);
-        //null属性显示
-        fastJsonConfig.setSerializerFeatures(SerializerFeature.WriteNullStringAsEmpty);
-        //消除对同一对象循环引用的问题，默认为false，去掉$监测
-//        fastJsonConfig.setSerializerFeatures(SerializerFeature.DisableCircularReferenceDetect);
+        fastJsonConfig.setSerializerFeatures(
+                //格式化
+                SerializerFeature.PrettyFormat,
+                //是否输出值为null的字段,默认为false
+                SerializerFeature.WriteMapNullValue,
+                //null属性显示为""
+                SerializerFeature.WriteNullStringAsEmpty,
+                //消除对同一对象循环引用的问题，默认为false，去掉$监测
+                SerializerFeature.DisableCircularReferenceDetect,
+                //如果为null,输出为[],而非null
+                SerializerFeature.WriteNullListAsEmpty
+                );
         fastConverter.setFastJsonConfig(fastJsonConfig);
         // 解决乱码的问题
         List<MediaType> fastMediaTypes = new ArrayList<MediaType>();
