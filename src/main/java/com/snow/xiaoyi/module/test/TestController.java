@@ -1,7 +1,6 @@
 package com.snow.xiaoyi.module.test;
 
 import com.snow.xiaoyi.common.bean.Result;
-import com.snow.xiaoyi.common.bean.Tips;
 import com.snow.xiaoyi.common.mapper.UserMapper;
 import com.snow.xiaoyi.common.pojo.Authority;
 import com.snow.xiaoyi.common.pojo.Role;
@@ -24,7 +23,7 @@ import java.util.*;
 @Api(tags = "测试")
 @RestController
 @RequestMapping("test")
-@AuthX(value = 1,name = "测试S",flag = true)
+
 public class TestController {
 
     @Autowired

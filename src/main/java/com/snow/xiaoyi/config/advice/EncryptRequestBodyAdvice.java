@@ -1,6 +1,7 @@
 package com.snow.xiaoyi.config.advice;
 
 import com.snow.xiaoyi.common.bean.Config;
+import com.snow.xiaoyi.common.util.AESUtils;
 import com.snow.xiaoyi.common.util.AesEncryptUtils;
 import com.snow.xiaoyi.common.util.IOUtils;
 import com.snow.xiaoyi.config.annotation.Decrypt;
@@ -80,7 +81,8 @@ class DecryptHttpInputMessage implements HttpInputMessage {
         if (content.startsWith("{")) {
         	decryptBody = content;
 		} else {
-			decryptBody = AesEncryptUtils.aesDecrypt(content, key);
+//			decryptBody = AesEncryptUtils.aesDecrypt(content, key);
+			decryptBody = AESUtils.aesDecrypt(content, key);
 		}
         long endTime = System.currentTimeMillis();
 		logger.debug("Decrypt Time:" + (endTime - startTime));

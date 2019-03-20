@@ -5,7 +5,6 @@ import com.snow.xiaoyi.common.bean.Config;
 import com.snow.xiaoyi.common.bean.Result;
 import com.snow.xiaoyi.common.pojo.Role;
 import com.snow.xiaoyi.common.pojo.User;
-import com.snow.xiaoyi.common.repository.UserRepository;
 import com.snow.xiaoyi.config.annotation.SecurityPermission;
 import com.snow.xiaoyi.config.security.SecurityContextHolder;
 import com.snow.xiaoyi.config.token.JWTToken;
@@ -73,7 +72,7 @@ public class SecurityInterceptor extends HandlerInterceptorAdapter {
                     return false;
                 }
             }else {
-                response(response,over());
+                    response(response,over());
                 return false;
             }
     }

@@ -2,6 +2,7 @@ package com.snow.xiaoyi.config.advice;
 
 import com.alibaba.fastjson.JSONObject;
 import com.snow.xiaoyi.common.bean.Config;
+import com.snow.xiaoyi.common.util.AESUtils;
 import com.snow.xiaoyi.common.util.AesEncryptUtils;
 import com.snow.xiaoyi.config.annotation.Encrypt;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +48,8 @@ public class EncryptResponseBodyAdvice implements ResponseBodyAdvice<Object> {
         if (encrypt) {
             try {
                 String content=objectMapper.toJSONString(o);
-                String result =  AesEncryptUtils.aesEncrypt(content, config.getAesKey());
+//                String result =  AesEncryptUtils.aesEncrypt(content, config.getAesKey());
+                String result =  AESUtils.aesEncrypt(content, config.getAesKey());
                 long endTime = System.currentTimeMillis();
                 log.debug("Encrypt Time:" + (endTime - startTime));
                 return result;

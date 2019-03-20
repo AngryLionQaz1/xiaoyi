@@ -1,6 +1,5 @@
 package com.snow.xiaoyi.common.pojo;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
