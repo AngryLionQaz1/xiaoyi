@@ -6,8 +6,6 @@ import com.snow.xiaoyi.common.repository.AuthorityRepository;
 import com.snow.xiaoyi.config.annotation.Auth;
 import com.snow.xiaoyi.config.annotation.AuthS;
 import com.snow.xiaoyi.config.annotation.AuthX;
-import com.snow.xiaoyi.config.annotation.AuthorityType;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -22,7 +20,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
+//@Component
 public class AppInit implements ApplicationRunner {
 
     @Autowired
@@ -33,7 +31,7 @@ public class AppInit implements ApplicationRunner {
     private Config config;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) {
         if (config.getAuthorityInit())new Thread(()->initData(getUrl())).run();
     }
 
