@@ -43,6 +43,8 @@ public class AppInit2 implements ApplicationRunner {
             Method m = map.get(info).getMethod();
             List<Authority> list=menu(count,info,m);
             list.forEach(a->{
+
+
                 //设置url
                 url(a,info,m);
                 //设置ApiOperation 基本信息
