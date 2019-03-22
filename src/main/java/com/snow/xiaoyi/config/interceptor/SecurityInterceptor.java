@@ -5,6 +5,7 @@ import com.snow.xiaoyi.common.bean.Config;
 import com.snow.xiaoyi.common.bean.Result;
 import com.snow.xiaoyi.common.pojo.Role;
 import com.snow.xiaoyi.common.pojo.User;
+import com.snow.xiaoyi.config.annotation.Security;
 import com.snow.xiaoyi.config.annotation.SecurityPermission;
 import com.snow.xiaoyi.config.security.SecurityContextHolder;
 import com.snow.xiaoyi.config.token.JWTToken;
@@ -59,9 +60,9 @@ public class SecurityInterceptor extends HandlerInterceptorAdapter {
             HandlerMethod handlerMethod = (HandlerMethod) handler;
             String token=request.getHeader(config.getAuthorization());
             //获取类上的注解
-            SecurityPermission requiredPermission=handlerMethod.getMethod().getDeclaringClass().getAnnotation(SecurityPermission.class);
+            Security requiredPermission=handlerMethod.getMethod().getDeclaringClass().getAnnotation(Security.class);
             // 获取方法上的注解
-            if (requiredPermission==null) requiredPermission = handlerMethod.getMethod().getAnnotation(SecurityPermission.class);
+            if (requiredPermission==null) requiredPermission = handlerMethod.getMethod().getAnnotation(Security.class);
             if (requiredPermission==null)return true;
             if (!"".equals(requiredPermission.value())&&permission(request.getRequestURI(),requiredPermission.value()))return true;
             if (Optional.ofNullable(token).isPresent()&& jwtToken.validateToken(token)&&jwtToken.getUserId(token)!=null){
