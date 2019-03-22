@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "权限")
 @RestController
 @RequestMapping("security")
-@Security(value = "/security/sx",order = 1,names = "权限一级菜单,权限二级级菜单,权限三级菜单,权限四级菜单")
+@Security(value = "/security/sx",order = 1,names = "权限一级菜单")
 public class SecurityController {
 
 
@@ -36,17 +36,34 @@ public class SecurityController {
 
     @GetMapping("s3")
     @ApiOperation(value = "三级权限")
-    @Security(menu = 3)
+    @Security(menu = 3,sign = 1,names = "权限二级级菜单")
     public Result s3(){
+
 
         return Result.success();
     }
 
 
+    @GetMapping("s3_2")
+    @ApiOperation(value = "三级权限2")
+    @Security(menu = 3,sign = 2,names = "权限二级级菜单2")
+    public Result s3_2(){
+
+
+        return Result.success();
+    }
+    @GetMapping("s3_21")
+    @ApiOperation(value = "三级权限21")
+    @Security(menu = 3,sign = 2,names = "权限二级级菜单2")
+    public Result s3_21(){
+
+
+        return Result.success();
+    }
 
     @GetMapping("s4")
     @ApiOperation(value = "四级权限")
-    @Security(menu = 4)
+    @Security(menu = 4,sign = 1,names = "权限二级级菜单,权限三级菜单")
     public Result s4(){
 
         return Result.success();

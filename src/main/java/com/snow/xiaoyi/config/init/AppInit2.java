@@ -113,8 +113,10 @@ public class AppInit2 implements ApplicationRunner {
     public List<Authority> menus(Security clzss,Security security,int count){
         int order = clzss.order();
         int menu = security.menu();
-        String[] split = clzss.names().split(",");
-        if (split.length<menu)throw new RuntimeException("菜单数量错误！");
+        String[] split = security.names().split(",");
+        List<String> index=new ArrayList<>();
+        index.add(clzss.names());
+        for (int i=0;i<split.length;i++) index.add(split[i]);
         List<Authority>list=new ArrayList<>();
         StringBuffer sb=new StringBuffer();
         sb.append(order);
@@ -123,13 +125,15 @@ public class AppInit2 implements ApplicationRunner {
                 String pCode=sb.toString();
                 sb.append("_");
                 sb.append(i);
+                if (security.sign()!=0) sb.append("/").append(security.sign());
                 String code=sb.toString();
-               list.add(Authority.builder().pName(split[i-2]).pCode(pCode).code(code).name(split[i-1]).mOrder(security.order()).ifMenu(true).flag(false).build());
+               list.add(Authority.builder().pName(index.get(i-2)).pCode(pCode).code(code).name(index.get(i-1)).mOrder(security.order()).ifMenu(true).flag(false).build());
             }else{
                 String pCode=sb.toString();
+                sb.append("_");
                 sb.append(count);
                 String code=sb.toString();
-                list.add(Authority.builder().pName(split[i-2]).pCode(pCode).code(code).mOrder(security.order()).ifMenu(false).flag(false).build());
+                list.add(Authority.builder().pName(index.get(i-2)).pCode(pCode).code(code).mOrder(security.order()).ifMenu(false).flag(false).build());
             }
         }
         return list;
