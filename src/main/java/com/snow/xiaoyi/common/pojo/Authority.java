@@ -37,7 +37,7 @@ public class Authority {
     /**是不是菜单*/
     private Boolean ifMenu;
     /**排序*/
-    private Integer order;
+    private Integer mOrder;
 
 //    @ManyToMany(cascade=CascadeType.REFRESH,mappedBy="authorities",fetch = FetchType.EAGER)
 //    @JSONField(serialize = false)
