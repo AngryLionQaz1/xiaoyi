@@ -29,7 +29,7 @@ config:
   file-path: img
   file-url: upload
   file-type: java,php,py,go
-  authority-init: true
+  authority-init: false
 
 
 mybatis:

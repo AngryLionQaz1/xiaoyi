@@ -23,7 +23,6 @@ import java.util.*;
 @Api(tags = "测试")
 @RestController
 @RequestMapping("test")
-
 public class TestController {
 
     @Autowired

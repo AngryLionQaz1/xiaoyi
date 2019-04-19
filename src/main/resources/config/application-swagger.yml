@@ -11,3 +11,5 @@ swagger:
       base-package: com.snow.xiaoyi.module.user
     file:
       base-package: com.snow.xiaoyi.module.file
+    security:
+      base-package: com.snow.xiaoyi.module.security
