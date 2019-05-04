@@ -3,8 +3,11 @@ package com.snow.xiaoyi.config.interceptor;
 import com.alibaba.fastjson.JSON;
 import com.snow.xiaoyi.common.bean.Config;
 import com.snow.xiaoyi.common.bean.Result;
+import com.snow.xiaoyi.common.mapper.BaseMapper;
 import com.snow.xiaoyi.common.pojo.Role;
 import com.snow.xiaoyi.common.pojo.User;
+import com.snow.xiaoyi.common.util.JwtUtils;
+import com.snow.xiaoyi.common.util.StringUtils;
 import com.snow.xiaoyi.config.annotation.Security;
 import com.snow.xiaoyi.config.annotation.SecurityPermission;
 import com.snow.xiaoyi.config.security.SecurityContextHolder;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -31,10 +35,8 @@ public class SecurityInterceptor extends HandlerInterceptorAdapter {
 
     @Autowired
     private Config config;
-    @Autowired
-    private JWTToken jwtToken;
-    @Autowired
-    private UserRedis userRedis;
+    @Resource
+    private BaseMapper baseMapper;
     @Autowired
     private SecurityContextHolder securityContextHolder;
 
@@ -55,61 +57,41 @@ public class SecurityInterceptor extends HandlerInterceptorAdapter {
         securityContextHolder.removeUser();
     }
 
-
-    private boolean hasPermission(HttpServletRequest request, HttpServletResponse response,Object handler) {
-            HandlerMethod handlerMethod = (HandlerMethod) handler;
-            String token=request.getHeader(config.getAuthorization());
-            //获取类上的注解
-            Security requiredPermission=handlerMethod.getMethod().getDeclaringClass().getAnnotation(Security.class);
-            // 获取方法上的注解
-            if (requiredPermission==null) requiredPermission = handlerMethod.getMethod().getAnnotation(Security.class);
-            if (requiredPermission==null)return true;
-            if (!"".equals(requiredPermission.value())&&permission(request.getRequestURI(),requiredPermission.value()))return true;
-            if (Optional.ofNullable(token).isPresent()&& jwtToken.validateToken(token)&&jwtToken.getUserId(token)!=null){
-                if (permissionUser(request.getRequestURI(),jwtToken.getUserId(token))){
-                    return true;
-                }else {
-                    response(response,auth());
-                    return false;
-                }
-            }else {
-                    response(response,over());
+    private boolean hasPermission(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        HandlerMethod handlerMethod = (HandlerMethod) handler;
+        String token = request.getHeader(config.getAuthorization());
+        //获取类上的注解
+        Security requiredPermission = handlerMethod.getMethod().getDeclaringClass().getAnnotation(Security.class);
+        // 获取方法上的注解
+        if (requiredPermission == null) requiredPermission = handlerMethod.getMethod().getAnnotation(Security.class);
+        if (requiredPermission == null) return true;
+        if (!"".equals(requiredPermission.value()) && permission(request.getRequestURI(), requiredPermission.value()))
+            return true;
+        if (Optional.ofNullable(token).isPresent()) {
+            Result result = checkToken(token, request.getRequestURI());
+            if (result.getCode() != 1) {
+                response(response, result);
                 return false;
             }
-    }
-
-    private boolean permissionUser(String uri,String id){
-        boolean flag=false;
-        User o=userRedis.getUser(Long.valueOf(id));
-        if (o==null)return false;
-        List<Role> roles=o.getRoles();
-        if (checkAdmin(roles))return setUser(o);
-        for (int i=0;i<roles.size();i++){
-            for (int j=0;j<roles.get(i).getAuthorities().size();j++){
-                if (uri.equals(roles.get(i).getAuthorities().get(j).getUri())){
-                    flag=setUser(o);
-                    break;
-                }
-            }
+            setUser(Long.valueOf(result.getData().toString()));
+            return true;
+        } else {
+            response(response, over());
+            return false;
         }
-        return flag;
     }
 
-    private boolean checkAdmin(List<Role> roles){
-        boolean flag=false;
-        for (int i=0;i<roles.size();i++){
-            if (config.getAuthorityAdmin().equals(roles.get(i).getCode())){
-                flag=true;
-                break;
-            }
-        }
-        return flag;
+    private void setUser(Long userId) {
+        securityContextHolder.setUser(userId);
     }
 
-    private boolean setUser(User user){
-        user.setRoles(new ArrayList<>());
-        securityContextHolder.setUser(user);
-        return true;
+    private Result checkToken(String token,String uri) {
+        String userId = JwtUtils.getInfoFromToken(token, config.getJwtSecretKey());
+        if (userId==null)return Result.over();
+        if (StringUtils.isNull(uri)) return Result.success(userId);
+        if (baseMapper.findRole(userId, config.getAuthorityAdmin()).size()>0) return Result.success(userId);
+        if (baseMapper.findPermissions(userId,uri).size()==0)return Result.auth();
+        return Result.success(userId);
     }
 
     private boolean permission(String uri,String value){

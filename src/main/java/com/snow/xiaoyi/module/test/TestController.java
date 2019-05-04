@@ -1,6 +1,7 @@
 package com.snow.xiaoyi.module.test;
 
 import com.snow.xiaoyi.common.bean.Result;
+import com.snow.xiaoyi.common.mapper.BaseMapper;
 import com.snow.xiaoyi.common.mapper.UserMapper;
 import com.snow.xiaoyi.common.pojo.Authority;
 import com.snow.xiaoyi.common.pojo.Role;
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 
@@ -35,8 +37,43 @@ public class TestController {
     private RoleRepository roleRepository;
     @Autowired
     private UserRepository userRepository;
-    @Autowired
+    @Resource
     private UserMapper userMapper;
+    @Resource
+    private BaseMapper mapper;
+
+
+    @GetMapping("uri")
+    public Result uri(@RequestParam String uri){
+        return Result.success(mapper.uri(uri));
+    }
+    @GetMapping("uri_0")
+    public Result uri_0(@RequestParam String uri){
+        return Result.success(mapper.findPermissionsByUri(uri));
+    }
+
+
+    @GetMapping("Permissions")
+    public Result Permissions(@RequestParam String userId,@RequestParam String uri){
+        return Result.success(mapper.permissions(userId,uri));
+    }
+
+    @GetMapping("Permissions_1")
+    public Result Permissions_1(@RequestParam String userId,@RequestParam String uri){
+        return Result.success(mapper.findPermissions(userId,uri));
+    }
+
+
+
+    @GetMapping("Role")
+    public Result Role(@RequestParam String userId,@RequestParam String code){
+        return Result.success(mapper.role(userId,code));
+    }
+
+    @GetMapping("Role_1")
+    public Result Role_1(@RequestParam String userId,@RequestParam String code){
+        return Result.success(mapper.findRole(userId,code));
+    }
 
 
 

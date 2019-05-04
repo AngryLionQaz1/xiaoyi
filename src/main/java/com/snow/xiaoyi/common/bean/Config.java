@@ -16,10 +16,7 @@ public class Config {
      * 存储当前登录token
      */
     private String token = "authorization";
-    /**
-     * JWT字段名
-     */
-    private String jwtKey = "AUTHORITIES_KEY";
+
     /**
      * JWT签名密钥
      */

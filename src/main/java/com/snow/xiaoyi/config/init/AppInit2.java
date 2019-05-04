@@ -21,7 +21,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
+//@Component
 public class AppInit2 implements ApplicationRunner {
 
     @Autowired
