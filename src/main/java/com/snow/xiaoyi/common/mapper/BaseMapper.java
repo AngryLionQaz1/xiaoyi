@@ -1,5 +1,6 @@
 package com.snow.xiaoyi.common.mapper;
 
+import com.snow.xiaoyi.common.pojo.Permissions;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
@@ -97,11 +98,41 @@ public interface BaseMapper {
     List<Map>findRole(@Param("userId") String userId, @Param("code") String code);
 
 
-
-
-
-
-
-
+    String sql3_3="SELECT\n" +
+            "\tax.p_id AS id,\n" +
+            "\tax.p_name AS NAME,\n" +
+            "\tax.p_code AS CODE,\n" +
+            "\tax.p_p_code AS p_code,\n" +
+            "\tax.p_p_name AS p_name,\n" +
+            "\tax.p_uri AS uri,\n" +
+            "\tax.p_details AS details,\n" +
+            "\tax.p_flag AS flag,\n" +
+            "\tax.p_if_menu AS if_menu,\n" +
+            "\tax.p_m_order AS m_order \n" +
+            "FROM\n" +
+            "\t(\n" +
+            "SELECT\n" +
+            "\tuser0_.id AS id1_3_0_,\n" +
+            "\tpermission4_.id AS p_id,\n" +
+            "\tpermission4_.NAME AS p_name,\n" +
+            "\tpermission4_.CODE AS p_code,\n" +
+            "\tpermission4_.p_code AS p_p_code,\n" +
+            "\tpermission4_.p_name AS p_p_name,\n" +
+            "\tpermission4_.uri AS p_uri,\n" +
+            "\tpermission4_.details AS p_details,\n" +
+            "\tpermission4_.flag AS p_flag,\n" +
+            "\tpermission4_.if_menu AS p_if_menu,\n" +
+            "\tpermission4_.m_order AS p_m_order \n" +
+            "FROM\n" +
+            "\ts_user user0_\n" +
+            "\tLEFT OUTER JOIN s_user_roles roles1_ ON user0_.id = roles1_.user_id\n" +
+            "\tLEFT OUTER JOIN s_role role2_ ON roles1_.role_id = role2_.id\n" +
+            "\tLEFT OUTER JOIN s_role_permissions permission3_ ON role2_.id = permission3_.role_id\n" +
+            "\tLEFT OUTER JOIN s_permissions permission4_ ON permission3_.permissions_id = permission4_.id \n" +
+            "WHERE\n" +
+            "\tuser0_.id = #{userId}\n" +
+            "\t) AS ax";
+    @Select(sql3_3)
+    List<Permissions> userPermissions(@Param("userId") String userId);
 
 }

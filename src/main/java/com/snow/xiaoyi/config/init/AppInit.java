@@ -20,7 +20,6 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
 @Component
 public class AppInit implements ApplicationRunner {
 
@@ -36,10 +35,12 @@ public class AppInit implements ApplicationRunner {
         if (config.getAuthorityInit())new Thread(()->init()).run();
     }
 
+
     private void init(){
         RequestMappingHandlerMapping mapping = applicationContext.getBean(RequestMappingHandlerMapping.class);
         //获取url与类和方法的对应信息
         Map<RequestMappingInfo, HandlerMethod> map = mapping.getHandlerMethods();
+         map = MapValueComparator.sortMapByValue(map);
         List<Permissions> authorities = new ArrayList<>();
         int count=0;
         for (RequestMappingInfo info : map.keySet()){
@@ -59,9 +60,13 @@ public class AppInit implements ApplicationRunner {
                 .stream()
                 .filter(i->!checkData(i.getUri()))
                 .collect(Collectors.toList());
-        if (authorities.size()>0)
-        permissionsRepository.saveAll(authorities);
+        if (authorities.size()>0){
+            authorities.stream().forEach(i-> System.out.println(i));
+            permissionsRepository.saveAll(authorities);
+        }
+
     }
+
     /**
      * 查看数据库中是否存在
      * @param url
@@ -69,9 +74,8 @@ public class AppInit implements ApplicationRunner {
      */
     private boolean checkData(String url){
         if ("".equals(url)||url==null)return false;
-        return !permissionsRepository.findByUri(url).isPresent();
+        return permissionsRepository.findByUri(url).isPresent();
     }
-
 
 
     /**
@@ -91,6 +95,8 @@ public class AppInit implements ApplicationRunner {
 
     }
 
+
+
     /**
      * 权限
      */
@@ -104,15 +110,19 @@ public class AppInit implements ApplicationRunner {
             Arrays.stream(ss).forEach((v) -> strings.add(v));
             if (strings.contains(urls[i])) return null;
         }
-            StringBuffer sb = new StringBuffer();
-            sb.append(clzss.order()).append(count);
+        StringBuffer sb = new StringBuffer();
+        sb.append(clzss.order()).append(count);
         return Permissions.builder().pName(split[0]).pCode(String.valueOf(clzss.order())).code(sb.toString()).mOrder(0).ifMenu(false).flag(false).build();
 
     }
+
+
+
+
     /**
      * 普通菜单
      */
-    public List<Permissions> menus(Security clzss,Security security,int count){
+    public List<Permissions> menus(Security clzss, Security security, int count){
         int order = clzss.order();
         int menu = security.menu();
         String[] split = security.names().split(",");
@@ -129,13 +139,13 @@ public class AppInit implements ApplicationRunner {
                 sb.append(i);
                 if (security.sign()!=0) sb.append("/").append(security.sign());
                 String code=sb.toString();
-               list.add(Permissions.builder().pName(index.get(i-2)).pCode(pCode).code(code).name(index.get(i-1)).mOrder(security.order()).ifMenu(true).flag(false).build());
+               list.add(Permissions.builder().pName(index.get(i-2)).pCode(pCode).code(code).name(index.get(i-1)).mOrder(security.order()).ifMenu(true).flag(false).uri(code).build());
             }else{
                 String pCode=sb.toString();
                 sb.append("_");
                 sb.append(count);
                 String code=sb.toString();
-                list.add(Permissions.builder().pName(index.get(i-2)).pCode(pCode).code(code).mOrder(security.order()).ifMenu(false).flag(false).build());
+                list.add(Permissions.builder().pName(index.get(i-2)).pCode(pCode).code(code).mOrder(security.order()).ifMenu(false).flag(false).uri(code).build());
             }
         }
         return list;
@@ -155,6 +165,7 @@ public class AppInit implements ApplicationRunner {
                .mOrder(security.order())
                .ifMenu(true)
                .flag(true)
+               .uri(String.valueOf(security.order()))
                .build();
     }
 

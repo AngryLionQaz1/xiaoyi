@@ -1,11 +1,13 @@
 package com.snow.xiaoyi.common.pojo;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Builder
 @Entity
@@ -39,6 +41,9 @@ public class Permissions {
     private Boolean ifMenu;
     /**排序*/
     private Integer mOrder;
+
+    @Transient
+    private List<Permissions> permissions;
 
 
 

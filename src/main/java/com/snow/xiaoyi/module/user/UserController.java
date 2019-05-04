@@ -16,6 +16,7 @@ import com.snow.xiaoyi.config.annotation.Auth;
 import com.snow.xiaoyi.config.annotation.AuthX;
 import com.snow.xiaoyi.config.annotation.SecurityPermission;
 import com.snow.xiaoyi.config.token.JWTToken;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -47,6 +48,12 @@ public class UserController {
     private JWTToken jwtToken;
 
 
+    @GetMapping("authssss")
+    @ApiOperation(value ="获取用户权限" )
+    public Result auths(){
+
+        return userService.auths();
+    }
 
     @GetMapping("sxsw")
 //    @Auth(value = 21)

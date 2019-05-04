@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "权限")
 @RestController
 @RequestMapping("security")
-@Security(value = "/security/sx",order = 1,names = "权限一级菜单")
+@Security(value = "sx",order = 1,names = "权限一级菜单")
 public class SecurityController {
 
 
