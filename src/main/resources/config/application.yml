@@ -1,5 +1,5 @@
 ##主配置信息
 spring:
   profiles:
-    active: dev,mysql,swagger,redis,actuator
+    active: dev,mysql,redis,actuator
 

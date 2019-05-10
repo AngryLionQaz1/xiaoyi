@@ -37,6 +37,7 @@ public class User  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(columnDefinition = "")
     private String username;
     private String password;
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
