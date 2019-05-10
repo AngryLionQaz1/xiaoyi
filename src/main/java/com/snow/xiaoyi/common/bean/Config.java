@@ -17,9 +17,9 @@ public class Config {
      */
     private String token = "authorization";
     /**
-     * JWT字段名
+     * jwt key
      */
-    private String jwtKey = "AUTHORITIES_KEY";
+    private String jwtKey;
     /**
      * JWT签名密钥
      */
@@ -57,9 +57,6 @@ public class Config {
      * 开启调试模式，调试模式下不进行加解密操作，用于像Swagger这种在线API测试场景
      */
     private boolean aesDebug = false;
-
-
-
 
 
 }

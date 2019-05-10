@@ -1,15 +1,15 @@
 package com.snow.xiaoyi.config.security;
 
-import com.snow.xiaoyi.common.pojo.User;
 import org.springframework.stereotype.Component;
 
 @Component
 public  class SecurityContextHolder {
 
-    private static ThreadLocal<User> securityContext=new ThreadLocal<>();
 
-    public void setUser(User user){
-        securityContext.set(user);
+    private static ThreadLocal<Long> securityContext=new ThreadLocal<>();
+
+    public void setUser(Long userId){
+        securityContext.set(userId);
     }
 
     public void removeUser(){
@@ -17,9 +17,10 @@ public  class SecurityContextHolder {
     }
 
 
-    public User getUser(){
-     return securityContext.get();
+    public Long getUser(){
+        return securityContext.get();
     }
+
 
 
 

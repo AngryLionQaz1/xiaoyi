@@ -1,11 +1,11 @@
 package com.snow.xiaoyi.config.init;
 
+
+
 import com.snow.xiaoyi.common.bean.Config;
-import com.snow.xiaoyi.common.pojo.Authority;
-import com.snow.xiaoyi.common.repository.AuthorityRepository;
-import com.snow.xiaoyi.config.annotation.Auth;
-import com.snow.xiaoyi.config.annotation.AuthS;
-import com.snow.xiaoyi.config.annotation.AuthX;
+import com.snow.xiaoyi.common.pojo.Permissions;
+import com.snow.xiaoyi.common.repository.PermissionsRepository;
+import com.snow.xiaoyi.config.annotation.Security;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -20,175 +20,180 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
-//@Component
+@Component
 public class AppInit implements ApplicationRunner {
 
     @Autowired
     private WebApplicationContext applicationContext;
     @Autowired
-    private AuthorityRepository authorityRepository;
+    private PermissionsRepository permissionsRepository;
     @Autowired
     private Config config;
 
     @Override
     public void run(ApplicationArguments args) {
-        if (config.getAuthorityInit())new Thread(()->initData(getUrl())).run();
+        if (config.getAuthorityInit())new Thread(()->init()).run();
     }
 
+
+    private void init(){
+        RequestMappingHandlerMapping mapping = applicationContext.getBean(RequestMappingHandlerMapping.class);
+        //获取url与类和方法的对应信息
+        Map<RequestMappingInfo, HandlerMethod> map = mapping.getHandlerMethods();
+         map = MapValueComparator.sortMapByValue(map);
+        List<Permissions> authorities = new ArrayList<>();
+        int count=0;
+        for (RequestMappingInfo info : map.keySet()){
+            Method m = map.get(info).getMethod();
+            List<Permissions> list=menu(count,info,m);
+            if (list==null)continue;
+            list.stream()
+                    .filter(Objects::nonNull)
+                    .forEach(i->apiOperation(i,info,m));
+            authorities.addAll(list);
+            count++;
+        }
+        authorities = authorities.stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.collectingAndThen(
+                        Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Permissions::getCode))), ArrayList::new))
+                .stream()
+                .filter(i->!checkData(i.getUri()))
+                .collect(Collectors.toList());
+        if (authorities.size()>0){
+            authorities.stream().forEach(i-> System.out.println(i));
+            permissionsRepository.saveAll(authorities);
+        }
+
+    }
 
     /**
      * 查看数据库中是否存在
      * @param url
      * @return
      */
-     private boolean checkData(String url){
-         return authorityRepository.findByUri(url).isPresent();
-     }
+    private boolean checkData(String url){
+        if ("".equals(url)||url==null)return false;
+        return permissionsRepository.findByUri(url).isPresent();
+    }
 
-     private List<Authority> makeData(List<Map<String,String>> urls){
-       return   urls.stream()
-                 .filter(Objects::nonNull)
-                 .filter(i->!checkData(i.get("url")))
-                 .map(i->makeData(i))
-                 .collect(Collectors.toList());
-     }
 
     /**
-     * 生成数据
-     * @param map
-     * @return
+     * 获取菜单
      */
-    private Authority makeData(Map<String,String> map){
-        Authority a=Authority.builder().build();
-        if (map.containsKey("name"))a.setName(map.get("name"));
-        if (map.containsKey("code"))a.setCode(map.get("code"));
-        if (map.containsKey("pCode"))a.setPCode(map.get("pCode"));
-        if (map.containsKey("url"))a.setUri(map.get("url"));
-        if (map.containsKey("details"))a.setDetails(map.get("details"));
-        if (map.containsKey("pName"))a.setPName(map.get("pName"));
-        a.setFlag(false);
-        a.setIfMenu(false);
-        return a;
+    public List<Permissions> menu(Integer count, RequestMappingInfo info, Method m){
+        //获取类上security
+        Security clzss=m.getDeclaringClass().getAnnotation(Security.class);
+        if (clzss==null)return null;
+        List<Permissions> list=new ArrayList<>();
+        list.add(menuTop(clzss));
+        //获取方法上的security
+        Security security = m.getAnnotation(Security.class);
+        if (security!=null)list.addAll(menus(clzss,security,count));
+        if (security==null)list.add(security(clzss,info,count));
+        return list;
+
     }
-    
+
+
+
     /**
-     * 数据库
-     * @param urls
+     * 权限
      */
-    private void initData(List<Map<String,String>> urls){
-        authorityRepository.saveAll(makeData(urls));
+    public Permissions security(Security clzss, RequestMappingInfo info, int count) {
+        String[] split = clzss.names().split(",");
+        String[] urls = clzss.value().split(",");
+        for (int i = 0; i < urls.length; i++) {
+            String url = getUrl(info);
+            Set<String> strings = new LinkedHashSet<>();
+            String[] ss = url.split("/");
+            Arrays.stream(ss).forEach((v) -> strings.add(v));
+            if (strings.contains(urls[i])) return null;
+        }
+        StringBuffer sb = new StringBuffer();
+        sb.append(clzss.order()).append(count);
+        return Permissions.builder().pName(split[0]).pCode(String.valueOf(clzss.order())).code(sb.toString()).mOrder(0).ifMenu(false).flag(false).build();
+
     }
+
+
+
+
+    /**
+     * 普通菜单
+     */
+    public List<Permissions> menus(Security clzss, Security security, int count){
+        int order = clzss.order();
+        int menu = security.menu();
+        String[] split = security.names().split(",");
+        List<String> index=new ArrayList<>();
+        index.add(clzss.names());
+        for (int i=0;i<split.length;i++) index.add(split[i]);
+        List<Permissions>list=new ArrayList<>();
+        StringBuffer sb=new StringBuffer();
+        sb.append(order);
+        for (int i=2;i<=menu;i++){
+            if (i!=menu){
+                String pCode=sb.toString();
+                sb.append("_");
+                sb.append(i);
+                if (security.sign()!=0) sb.append("/").append(security.sign());
+                String code=sb.toString();
+               list.add(Permissions.builder().pName(index.get(i-2)).pCode(pCode).code(code).name(index.get(i-1)).mOrder(security.order()).ifMenu(true).flag(false).uri(code).build());
+            }else{
+                String pCode=sb.toString();
+                sb.append("_");
+                sb.append(count);
+                String code=sb.toString();
+                list.add(Permissions.builder().pName(index.get(i-2)).pCode(pCode).code(code).mOrder(security.order()).ifMenu(false).flag(false).uri(code).build());
+            }
+        }
+        return list;
+    }
+
+
+    /**
+     * 顶级菜单
+     */
+    public Permissions menuTop(Security security){
+       return Permissions
+               .builder()
+               .pName("")
+               .pCode("")
+               .code(String.valueOf(security.order()))
+               .name(security.names().split(",")[0])
+               .mOrder(security.order())
+               .ifMenu(true)
+               .flag(true)
+               .uri(String.valueOf(security.order()))
+               .build();
+    }
+
+
 
     /**
      * 获取url
-     * @return
      */
-    private List<Map<String,String>> getUrl(){
-        RequestMappingHandlerMapping mapping = applicationContext.getBean(RequestMappingHandlerMapping.class);
-        //获取url与类和方法的对应信息
-        Map<RequestMappingInfo,HandlerMethod> map = mapping.getHandlerMethods();
-        List<Map<String,String>> urlList = new ArrayList<>();
-        for (RequestMappingInfo info : map.keySet()){
-            urlList.add(makeAuthority(info,map));
-        }
-        return urlList;
+    public void url(Permissions a, RequestMappingInfo info){
+       a.setUri(getUrl(info));
     }
 
-    /***
-     * 获取权限信息
-     * @param info
-     * @param map
-     * @return
-     */
-    public  Map<String,String> makeAuthority(RequestMappingInfo info,  Map<RequestMappingInfo,HandlerMethod> map){
-        HandlerMethod hm = map.get(info);
-        Method m = hm.getMethod();
-        Map<String,String> limitMap=auth(m);
-        if (limitMap==null)return null;
+    private String getUrl(RequestMappingInfo info){
+        String url="";
         //获取url的Set集合，一个方法可能对应多个url
         Set<String> patterns = info.getPatternsCondition().getPatterns();
-        for (String url : patterns) limitMap.put("url",url);
-        getAuthority(m,limitMap);
-        return limitMap;
+        for (String url2 : patterns)url=url2;
+        return url;
     }
+
 
     /**
-     * 权限分类
+     * 获取ApiOperation 基本信息
      */
-    public Map<String,String> auth(Method m){
-        //获取方法上的注解
-        Auth a=m.getAnnotation(Auth.class);
-        if (a==null)return null;
-        //获取类上注解
-        AuthX ax=m.getDeclaringClass().getAnnotation(AuthX.class);
-        if (ax==null)return null;
-        Map<String,String> map=new HashMap<>();
-        map.put("code",String.valueOf(a.value()));
-        map.put("pCode",String.valueOf(ax.value()));
-        map.put("pName",String.valueOf(ax.name()));
-        initFlag(ax);
-        AuthX ax2=m.getAnnotation(AuthX.class);
-        if (ax2!=null){
-            initFlag(String.valueOf(ax.value()),ax2);
-            map.put("pCode",String.valueOf(ax2.value()));
-            map.put("pName",String.valueOf(ax2.name()));
-        }
-        AuthS ax3=m.getAnnotation(AuthS.class);
-        if (ax3!=null){
-            initFlag(String.valueOf(ax2.value()),ax3);
-            map.put("pCode",String.valueOf(ax3.value()));
-            map.put("pName",String.valueOf(ax3.name()));
-        }
-        return map;
-    }
-
-
-    /***
-     * 菜单初始化
-     */
-    public void initFlag(AuthX authX){
-        Optional<Authority> byCode = authorityRepository.findByCode(String.valueOf(authX.value()));
-        if (byCode.isPresent())return;
-        Authority build = Authority.builder()
-                .name(authX.name())
-                .code(String.valueOf(authX.value()))
-                .flag(authX.flag())
-                .pCode(String.valueOf(authX.value()))
-                .ifMenu(true)
-                .build();
-        authorityRepository.save(build);
-    }
-    public void initFlag(String pCode, AuthX authX){
-        Optional<Authority> byCode = authorityRepository.findByCode(String.valueOf(authX.value()));
-        if (byCode.isPresent())return;
-        Authority build = Authority.builder()
-                .name(authX.name())
-                .code(String.valueOf(authX.value()))
-                .flag(authX.flag())
-                .pCode(pCode)
-                .ifMenu(true)
-                .build();
-        authorityRepository.save(build);
-    }
-    public void initFlag(String pCode, AuthS authS){
-        Optional<Authority> byCode = authorityRepository.findByCode(String.valueOf(authS.value()));
-        if (byCode.isPresent())return;
-        Authority build = Authority.builder()
-                .name(authS.name())
-                .code(String.valueOf(authS.value()))
-                .flag(authS.flag())
-                .pCode(pCode)
-                .ifMenu(true)
-                .build();
-        authorityRepository.save(build);
-    }
-
-    /**
-     * 获取参数信息
-     * @param m
-     * @param limitMap
-     */
-    public void getAuthority(Method m,Map<String,String> limitMap){
+    public void apiOperation(Permissions a, RequestMappingInfo info, Method m ){
+        if (a.getIfMenu())return;
+        //设置url
+        url(a,info);
         ApiOperation apiOperation = m.getAnnotation(ApiOperation.class);
         Method[] me = {};
         if(apiOperation!=null) me = apiOperation.annotationType().getDeclaredMethods();
@@ -196,16 +201,18 @@ public class AppInit implements ApplicationRunner {
             try {
                 if("notes".equals(meth.getName())){
                     String color = (String) meth.invoke(apiOperation, new  Object[]{});
-                    limitMap.put("details",color);
+                    a.setDetails(color);
                 }
                 if("value".equals(meth.getName())){
                     String color = (String) meth.invoke(apiOperation, new  Object[]{});
-                    limitMap.put("name",color);
+                    a.setName(color);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
+
+
 }
 

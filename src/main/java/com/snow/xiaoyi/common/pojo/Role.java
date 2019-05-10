@@ -1,6 +1,5 @@
 package com.snow.xiaoyi.common.pojo;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,12 +23,9 @@ public class Role {
     private Long id;
     private String name;
     private String code;
-    @ManyToMany(targetEntity = User.class,mappedBy = "roles")
-    @JSONField(serialize = false)
-    private List<User> users;
-    @ManyToMany(cascade=CascadeType.REFRESH,fetch = FetchType.LAZY)
-    @JoinTable(inverseJoinColumns=@JoinColumn(name="authority_id"), joinColumns=@JoinColumn(name="role_id"))
-    private List<Authority> authorities;
+    @ManyToMany(cascade=CascadeType.REFRESH,fetch = FetchType.EAGER)
+    @JoinTable(inverseJoinColumns=@JoinColumn(name="permissions_id"), joinColumns=@JoinColumn(name="role_id"))
+    private List<Permissions> permissions;
 
 
 

@@ -7,11 +7,13 @@
  */
 package com.snow.xiaoyi.config.interceptor;
 
+
 import com.snow.xiaoyi.common.pojo.User;
 import com.snow.xiaoyi.common.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
+
 import java.util.Optional;
 
 @Component
@@ -21,8 +23,8 @@ public class UserRedis {
     private UserRepository userRepository;
 
     @Cacheable(key="'user_'+#id",value="'user")
-    public User getUser(Long userId){
-        Optional<User> byUsername = userRepository.findById(userId);
+    public User getUser(Long id){
+        Optional<User> byUsername = userRepository.findById(id);
         if (!byUsername.isPresent())return null;
         User user=byUsername.get();
         return user;
