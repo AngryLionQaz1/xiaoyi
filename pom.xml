@@ -39,6 +39,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.nutz</groupId>
+            <artifactId>nutz</artifactId>
+            <version>1.r.67</version>
+        </dependency>
         <!-- Spring Boot Redis依赖 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
