@@ -8,6 +8,7 @@
 package com.snow.xiaoyi.module.test;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.snow.xiaoyi.common.bean.Config;
 import com.snow.xiaoyi.common.bean.Result;
 import com.snow.xiaoyi.common.pojo.Permissions;
@@ -25,11 +26,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Api(tags = "测试")
 @RestController
@@ -46,6 +48,70 @@ public class TestController {
     private TestService testService;
     @Autowired
     private Config config;
+
+
+    @PostMapping("gitea/{d}/{p}/{x}")
+    public Result gitea(@PathVariable String d,
+                        @PathVariable String p,
+                        @PathVariable String x,
+                        HttpServletRequest request, HttpServletResponse response){
+
+        System.out.println(d);
+        System.out.println(p);
+        System.out.println(x);
+
+        String param= null;
+        try {
+            BufferedReader streamReader = new BufferedReader( new InputStreamReader(request.getInputStream(), "UTF-8"));
+            StringBuilder responseStrBuilder = new StringBuilder();
+            String inputStr;
+            while ((inputStr = streamReader.readLine()) != null) {
+                responseStrBuilder.append(inputStr);
+            }
+
+            JSONObject jsonObject = JSONObject.parseObject(responseStrBuilder.toString());
+
+
+            Object secret = jsonObject.get("secret");
+
+            Object repository = jsonObject.get("repository");
+
+            JSONObject jsonObject1 = JSONObject.parseObject(repository.toString());
+
+            Object name = jsonObject1.get("name");
+
+            Object sshUrl = jsonObject1.get("ssh_url");
+
+            System.out.println(secret);
+            System.out.println(name);
+            System.out.println(sshUrl);
+
+
+            param= jsonObject.toJSONString();
+            System.out.println(param);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+//        Map<String, String> parameterMap = getAllRequestParam(request);
+//        System.out.println(parameterMap.size());
+//        parameterMap.forEach((k,v)->System.out.println(k+":"+v));
+        return Result.success();
+    }
+
+    private Map<String, String> getAllRequestParam(final HttpServletRequest request) {
+        Map<String, String> res = new HashMap<String, String>();
+        Enumeration<?> temp = request.getParameterNames();
+        if (null != temp) {
+            while (temp.hasMoreElements()) {
+                String en = (String) temp.nextElement();
+                String value = request.getParameter(en);
+                res.put(en, value);
+            }
+        }
+        return res;
+    }
+
 
 
     @GetMapping("password")

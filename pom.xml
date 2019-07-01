@@ -44,6 +44,13 @@
             <artifactId>nutz</artifactId>
             <version>1.r.67</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+            <version>0.2.1.RELEASE</version>
+        </dependency>
+
         <!-- Spring Boot Redis依赖 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

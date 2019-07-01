@@ -1,7 +1,7 @@
 ##主配置信息
 spring:
   profiles:
-    active: dev,mysql,redis,actuator
+    active: dev,mysql,redis,actuator,sentinel
 logging:
   config: classpath:config/logback-spring.xml
   level:
