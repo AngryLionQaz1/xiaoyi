@@ -11,6 +11,7 @@ package com.snow.xiaoyi.module.test;
 import com.alibaba.fastjson.JSONObject;
 import com.snow.xiaoyi.common.bean.Config;
 import com.snow.xiaoyi.common.bean.Result;
+import com.snow.xiaoyi.common.bean.UserInfoQuery;
 import com.snow.xiaoyi.common.pojo.Permissions;
 import com.snow.xiaoyi.common.pojo.Role;
 import com.snow.xiaoyi.common.pojo.User;
@@ -23,11 +24,14 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.time.LocalDateTime;
@@ -49,6 +53,16 @@ public class TestController {
     @Autowired
     private Config config;
 
+
+    @PostMapping("query")
+    public Result query(@Valid UserInfoQuery userInfo, BindingResult result) {
+        if (result.hasErrors()) {
+            for (ObjectError error : result.getAllErrors()) {
+                return Result.fail(error.getDefaultMessage());
+            }
+        }
+       return Result.success(userInfo);
+    }
 
     @PostMapping("gitea/{d}/{p}/{x}")
     public Result gitea(@PathVariable String d,
