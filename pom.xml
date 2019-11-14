@@ -152,6 +152,15 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/java</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>**/mapper/*.xml</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <!--maven 跳过 Test-->
             <plugin>
